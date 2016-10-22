@@ -11,6 +11,7 @@ import re
 from datetime import datetime
 
 camera = 2
+cameraNum = 1
 x = []
 y = []
 width = []
@@ -33,7 +34,7 @@ class FaceThread(threading.Thread):
 		self._frame_gray = cv2.cvtColor(self._frame, cv2.COLOR_BGR2GRAY)
 		self._cascade = cv2.CascadeClassifier(self._cascade_path)
 		self._facerect = self._cascade.detectMultiScale(
-		    self._frame_gray, scaleFactor=1.2, minNeighbors=3, minSize=(40, 40))
+		    self._frame_gray, scaleFactor=1.2, minNeighbors=3, minSize=(10, 10))
 
 		if len(self._facerect) > 0:
 			print 'Face has been detected'
@@ -43,6 +44,10 @@ class FaceThread(threading.Thread):
 			if os.path.isdir(self._imagePath) == False:
 				os.mkdir(self._imagePath)
 				print 'make image path'
+			else:
+				print 'path already exists'
+		else:
+			print 'where is the face?'
 
 		i = 0
 		for rect in self._facerect:
@@ -55,8 +60,7 @@ class FaceThread(threading.Thread):
 			for n in range(len(x)):
 				self._dst = self._frame[y[n]:y[n] + 10 +
 				    3 * height[n], x[n]:x[n] + 30 + width[n]]
-				self._newImage_path = self._image_path + \
-				    "/" + self._now + "_" + str(i) + '.jpg'
+				self._newImage_path = self._image_path + "/" + self._now + "_" + str(i) + '.jpg'
 				frame_height = self._frame.shape[0]
 				frame_width = self._frame.shape[1]
 				cv2.imwrite(self._newImage_path, self._dst)
@@ -67,7 +71,7 @@ class FaceThread(threading.Thread):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='face detect')
-	parser.add_argument('--data', '-d', type=str, default='')
+	parser.add_argument('--data', '-d', type=str, default='others')
 	args = parser.parse_args()
 
 	for i in range(camera+1):
@@ -75,10 +79,11 @@ if __name__ == '__main__':
 
 	while True:
 		ret, frame0 = cap[0].read()
+		#print frame0
         # ret, frame1 = cap[1].read()
 
         if(threading.activeCount() == 1):
-            th0 = FaceThread(frame0, cameraNum[0], args.data)
+            th0 = FaceThread(frame0, cameraNum[0], 'me')
             # th1 = FaceThread(frameresize1, cameraNum[1])
 
             th0.start()
