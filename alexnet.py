@@ -11,18 +11,18 @@ from chainer.training import extensions
 class Alex(chainer.Chain):
     """Single-GPU AlexNet without partition toward the channel axis."""
 
-    insize = 227
+    insize = 128
 
     def __init__(self, arg):
         super(Alex, self).__init__(
-            conv1=L.convolution2D(3, 96, 11, stride=4)
-            conv2=L.convolution2D(96, 256, 5, pad=2)
-            conv3=L.convolution2D(256, 384, 3, pad=1)
-            conv4=L.convolution2D(384, 384, 3, pad=1)
-            conv5=L.convolution2D(384, 256, 3, pad=1)
-            fc6=L.Linear(9216,4096)
-            fc7=L.Linear(4096,4096)
-            fc8=L.Linear(4096,1000)
+            conv1=L.convolution2D(3, 32, 8, stride=4)
+            conv2=L.convolution2D(32, 256, 5, pad=2)
+            conv3=L.convolution2D(256, 256, 3, pad=1)
+            conv4=L.convolution2D(256, 256, 3, pad=1)
+            conv5=L.convolution2D(256, 32, 3, pad=1)
+            fc6=L.Linear(288,144)
+            fc7=L.Linear(144,50)
+            fc8=L.Linear(50,3)
         )
         self.train = True
 
@@ -55,6 +55,12 @@ class Alex(chainer.Chain):
         print('# epoch: {}'.format(args.epoch))
         print('')
 
+        # prepare datasets
+        data = []
+        data.append(np.asarray(['./datasets/others', 0]))
+        data.append(np.asarray(['./datasets/me', 1]))
+        data.append(np.asarray(['./datasets/you', 2]))
+
         model = L.Classifier(Alex(args.channnel, len(detasets)))
         if args.gpu >= 0:
             chainer.cuda.get_device(args.gpu).use()
@@ -84,8 +90,12 @@ class Alex(chainer.Chain):
         trainer.run()
 
         #save models
+        output = "output" + str(len(data))
+        modelName =  output + '.model'
+        optimizerName = output + '.state'
 
-        #send to browser
+        chainer.serializers.save_npz(modelName, model)
+        chainer.serializers.save_npz(optimizerName, optimizer)
 
 
 if __name__ == '__main__':
