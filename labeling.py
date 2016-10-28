@@ -3,11 +3,11 @@
 import argparse
 import numpy as np
 import glob
-from PIL import image
+from PIL import Image
 from chainer.datasets import tuple_dataset
 
 
-def labeling():
+def labeling(data):
     imageData = []
     labelData = []
 
@@ -23,27 +23,23 @@ def labeling():
             imgData_G = np.asarray([np.float32(g)/255.0])
             imgData_B = np.asarray([np.float32(b)/255.0])
 
-            imgData = np.asarray([np.float32(imgData_R,imgData_G,imgData_B)
-            lblData = np.int32(label)
+            imgData = np.asarray([imgData_R,imgData_G,imgData_B])
+            lblData = label
 
             imageData.append(imgData)
-            labelData.append(lblData)
+            labelData.append(np.int32(lblData))
 
     threshold = np.int32(len(imageData)/10*8)
     train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
     test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
 
-return train, test
+    return train, test
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='labeling images')
-    parser.add_argument('--data_dir','-d',type=str,default='others')
-    parser.add_argument('--label','-l',type=int,default=0)
-
-    args = parser.parse_args()
-
-    data = []
-    data.append(np.asarray(['./datasets/others', 0]))
-    data.append(np.asarray(['./datasets/myself', 1]))
-    train, test = labeling(data)
+def getPredictData(image):
+    r,g,b = image.split()
+    imgData_R = np.asarray(np.float32(r)/255.0)
+    imgData_G = np.asarray(np.float32(g)/255.0)
+    imgData_B = np.asarray(np.float32(b)/255.0)
+    imgData = np.asarray([[[imgData_R, imgData_G, imgData_B]]])
+    return imgData

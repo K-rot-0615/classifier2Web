@@ -5,6 +5,7 @@ import cv2
 import time
 import os
 import os.path
+from PIL import Image
 
 camera = 1
 cameraNum = [0, 1, 2, 3]
@@ -44,12 +45,19 @@ def faceDetect(frame, cameraNum, save_file, resize):
 		height.append(rect[3] + 100)
 		for n in range(len(x)):
 			dst = frame[y[n]:y[n] + 10 + 3 * height[n], x[n]:x[n] + 30 + width[n]]
-			imgResize = cv2.resize(dst, (resize, resize))
+			imgResize = cv2.resize(dst,None,fx=dst.shape[0]/resize,fy=dst.shape[1]/resize))
 			newImage_path = image_path + "/" + str(i) + '.jpg'
 			cv2.imwrite(newImage_path, imgResize)
 			i += 1
 
 		time.sleep(3)
+
+
+def faceRead(path):
+	img = Image.open(path)
+	data = []
+	data.append(img)
+	return img
 
 
 if __name__ == '__main__':
