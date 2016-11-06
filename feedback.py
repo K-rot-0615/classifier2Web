@@ -1,6 +1,14 @@
 # -*- coding:utf-8 -*-
 
 import serial
+import socket
+
+udp_ip = "192.168.11.2"
+udp_port = 8888
+message = "konnichiwa, baby!"
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.sendto(message, (udp_ip,udp_port))
 
 com_num = 3
 
