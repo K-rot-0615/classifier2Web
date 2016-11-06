@@ -7,39 +7,88 @@ from PIL import Image
 from chainer.datasets import tuple_dataset
 
 
-def labeling(data):
-    imageData = []
-    labelData = []
-
-    # path and label
+def labeling(data, channel):
+    testData = []
     for n in data:
         path = n[0]
         label = n[1]
         imgList = glob.glob(path + '*')
         for imgName in imgList:
-            img = Image.open(imgName)
-            r,g,b = img.split()
-            imgData_R = np.asarray([np.float32(r)/255.0])
-            imgData_G = np.asarray([np.float32(g)/255.0])
-            imgData_B = np.asarray([np.float32(b)/255.0])
+            testData.append([imgName, label])
+    testData = np.random.permutation(testData)
 
-            imgData = np.asarray([imgData_R,imgData_G,imgData_B])
-            lblData = label
+    imageData = []
+    labelData = []
 
-            imageData.append(imgData)
-            labelData.append(np.int32(lblData))
+    if channel == 1:
+        for n in testData:
+            path = n[0]
+            label = n[1]
+            imgList = glob.glob(path + '*')
+            for imgName in imgList:
+                img = Image.open(imgName)
+                imgData = np.asarray([np.float32(img)/255.0])
+                lblData = label
 
-    threshold = np.int32(len(imageData)/10*8)
-    train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
-    test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
+                imageData.append(imgData)
+                labelData.append(np.int32(lblData))
+
+        threshold = np.int32(len(imageData)/10*8)
+        train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
+        test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
+
+    else:
+        # path and label
+        for n in testData:
+            path = n[0]
+            label = n[1]
+            imgList = glob.glob(path + '*.png')
+            for imgName in imgList:
+                img = Image.open(imgName)
+                r,g,b = img.split()
+                imgData_R = np.asarray(np.float32(r)/255.0)
+                imgData_G = np.asarray(np.float32(g)/255.0)
+                imgData_B = np.asarray(np.float32(b)/255.0)
+
+                imgData = np.asarray([imgData_R,imgData_G,imgData_B])
+                lblData = label
+                dimension = len(imgData)
+
+                imageData.append(imgData)
+                labelData.append(np.int32(lblData))
+
+            if dimension != 3:
+                print (dimension)
+
+        threshold = np.int32(len(imageData)/10*8)
+        train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
+        test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
 
     return train, test
 
 
-def getPredictData(image):
-    r,g,b = image.split()
-    imgData_R = np.asarray(np.float32(r)/255.0)
-    imgData_G = np.asarray(np.float32(g)/255.0)
-    imgData_B = np.asarray(np.float32(b)/255.0)
-    imgData = np.asarray([[[imgData_R, imgData_G, imgData_B]]])
-    return imgData
+def getPredictData(image, channel):
+    if channel == 1:
+        img = Image.open(image)
+        imgData = np.asarray([np.float32(img)/255.0])
+        return imgData
+
+    else:
+        img = Image.open(image)
+        r,g,b = img.split()
+        imgData_R = np.asarray(np.float32(r)/255.0)
+        imgData_G = np.asarray(np.float32(g)/255.0)
+        imgData_B = np.asarray(np.float32(b)/255.0)
+        imgData = np.asarray([[[imgData_R, imgData_G, imgData_B]]])
+
+        #print (imgData)
+        return imgData
+
+if __name__ == '__main__':
+    data = []
+    data.append(np.asarray(['./datasets/ryota/', 0]))
+    data.append(np.asarray(['./datasets/masakatsu/', 1]))
+    data.append(np.asarray(['./datasets/sakamoto/', 2]))
+    train, test = labeling(data)
+    print (len(test))
+    print (test[10])
