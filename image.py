@@ -5,6 +5,7 @@ import cv2
 import time
 import os
 import os.path
+import glob
 from PIL import Image
 
 camera = 1
@@ -19,9 +20,10 @@ global count
 def faceDetect(frame, cameraNum, save_file, resize):
 
 	cascade_path = "./lib/haarcascade_frontalface_default.xml"
-	frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	cascade = cv2.CascadeClassifier(cascade_path)
-	facerect = cascade.detectMultiScale(frame_gray, scaleFactor=1.2, minNeighbors=3, minSize=(10, 10))
+	#frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+	#facerect = cascade.detectMultiScale(frame_gray, scaleFactor=1.2, minNeighbors=3, minSize=(10, 10))
+	facerect = cascade.detectMultiScale(frame, scaleFactor=1.2, minNeighbors=3, minSize=(10, 10))
 	print facerect
 
 	if len(facerect) > 0:
@@ -45,19 +47,30 @@ def faceDetect(frame, cameraNum, save_file, resize):
 		height.append(rect[3] + 100)
 		for n in range(len(x)):
 			dst = frame[y[n]:y[n] + 10 + 3 * height[n], x[n]:x[n] + 30 + width[n]]
-			imgResize = cv2.resize(dst,None,fx=dst.shape[0]/resize,fy=dst.shape[1]/resize))
-			newImage_path = image_path + "/" + str(i) + '.jpg'
-			cv2.imwrite(newImage_path, imgResize)
-			i += 1
+			#imgResize = cv2.resize(dst,None,fx=dst.shape[0]/resize,fy=dst.shape[1]/resize)
+			imgResize = cv2.resize(dst,(resize,resize))
+			newImage_path = image_path + "/" + str(i) + '.png'
+			#while True:
+			    #if os.path.isfile(newImage_path):
+				    #i += 1
+                #else:
+				    #cv2.imwrite(newImage_path, imgResize)
+				    #break
+			if os.path.isfile(newImage_path):
+				i+=1
+			else:
+				cv2.imwrite(newImage_path, imgResize)
 
 		time.sleep(3)
 
 
 def faceRead(path):
-	img = Image.open(path)
 	data = []
-	data.append(img)
-	return img
+	for n in path:
+		imgList = glob.glob(path + '*.png')
+		for imgName in imgList:
+			data.append(imgName)
+	return data
 
 
 if __name__ == '__main__':
