@@ -57,9 +57,6 @@ def labeling(data, channel):
                 imageData.append(imgData)
                 labelData.append(np.int32(lblData))
 
-            if dimension != 3:
-                print (dimension)
-
         threshold = np.int32(len(imageData)/10*8)
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
         test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
