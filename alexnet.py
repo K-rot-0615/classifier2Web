@@ -20,7 +20,7 @@ class Alex(chainer.Chain):
             conv5=L.Convolution2D(256, 32, 3, pad=1),
             fc6=L.Linear(288,144),
             fc7=L.Linear(144,50),
-            fc8=L.Linear(50,1),
+            fc8=L.Linear(50,3),
         )
         self.train = True
 
