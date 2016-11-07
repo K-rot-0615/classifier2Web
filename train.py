@@ -3,10 +3,14 @@ from labeling import labeling
 
 import numpy as np
 import argparse
+from datetime import datetime
 
 import chainer
 import chainer.functions as F
 import chainer.links as L
+import chainer.serializers
+from chainer.datasets import tuple_dataset
+from chainer import Chain, Variable, optimizers
 from chainer import training
 from chainer.training import extensions
 
@@ -17,6 +21,7 @@ def main():
     parser.add_argument('--epoch', '-e', type=int, default=20)
     parser.add_argument('--gpu', '-g', type=int, default=-1)
     parser.add_argument('--out', '-o', default='result')
+    parser.add_argument('--channel', '-c', type=int, default=3)
 
     args = parser.parse_args()
 
@@ -29,9 +34,9 @@ def main():
     # prepare datasets
     data = []
     data.append(np.asarray(['./datasets/ryota/', 0]))
-    data.append(np.asarray(['./datasets/masakatsu/', 1]))
-    data.append(np.asarray(['./datasets/sakamoto/', 2]))
-    train, test = labeling(data)
+    data.append(np.asarray(['./datasets/sakamoto/', 1]))
+    data.append(np.asarray(['./datasets/masakatsu', 2]))
+    train, test = labeling(data, args.channel)
 
     model = L.Classifier(Alex())
     if args.gpu >= 0:
@@ -55,7 +60,12 @@ def main():
     trainer = training.Trainer(
         updater, (args.epoch, 'epoch'), out=args.out)
 
+    # evaluate the model with dataset for each epoch
     trainer.extend(extensions.Evaluator(test_iter, model, device=args.gpu))
+
+    # dump a computational graph from 'loss' variable
+    trainer.extend(extensions.dump_graph('main/loss'))
+
     trainer.extend(extensions.LogReport())
     trainer.extend(extensions.PrintReport(
         ['epoch', 'main/loss', 'validation/main/loss',
@@ -66,8 +76,9 @@ def main():
 
     # save models
     output = "output" + str(len(data))
-    modelName = output + '.model'
-    optimizerName = output + '.state'
+    date = datetime.now().strftime('%Y%m%d%H%M%S')
+    modelName = output + '_' + date + '.model'
+    optimizerName = output + '_' + date + '.state'
 
     chainer.serializers.save_npz(modelName, model)
     chainer.serializers.save_npz(optimizerName, optimizer)
