@@ -17,7 +17,7 @@ width = []
 height = []
 
 
-def faceRead(path):
+def dataRead(path):
 	data = []
 	imgList = glob.glob(path + '*.png')
 	for imgName in imgList:
@@ -52,14 +52,12 @@ def faceDetect(frame, cameraNum, pre_detectPath, savePath, resize):
 	i = 1
 	imageList = glob.glob(savePath + "*")
 	for rect in facerect:
-		print rect[0]
 		x.append(rect[0] - 50)
 		y.append(rect[1] - 50)
 		width.append(rect[2] + 100)
 		height.append(rect[3] + 100)
 		for n in range(len(x)):
 			dst = img[y[n]:y[n] + 10 + 3 * height[n], x[n]:x[n] + 30 + width[n]]
-			#imgResize = cv2.resize(dst,None,fx=dst.shape[0]/resize,fy=dst.shape[1]/resize)
 			imgResize = cv2.resize(dst,(resize,resize))
 			newImage_path = savePath + str(len(imageList) + i) + '.png'
 			#while True:
@@ -70,10 +68,8 @@ def faceDetect(frame, cameraNum, pre_detectPath, savePath, resize):
 				    #break
 			cv2.imwrite(newImage_path, imgResize)
 
-			#time.sleep(3)
 
-
-def faceCut(frame, cameraNum, pre_detectPath, savePath, resize):
+def faceDetect4Predict(frame, cameraNum, pre_detectPath, savePath, resize):
 
 	cascade_path = "./lib/haarcascade_frontalface_default.xml"
 	cascade = cv2.CascadeClassifier(cascade_path)
@@ -85,7 +81,7 @@ def faceCut(frame, cameraNum, pre_detectPath, savePath, resize):
 		print 'make pre_detectPath!'
 	cv2.imwrite(now_image, frame)
 
-	images = faceRead(pre_detectPath)
+	images = dataRead(pre_detectPath)
 	for image in images:
 		img = cv2.imread(image)
 	    #frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -121,12 +117,12 @@ def faceCut(frame, cameraNum, pre_detectPath, savePath, resize):
 				cv2.imwrite(newImage_path, imgResize)
 				i = i + 1
 
-				#time.sleep(3)
+			time.sleep(3)
 
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='face detect')
-	parser.add_argument('--detect', '-d', type=str, default='./datasets/pre_detect/')
+	parser.add_argument('--detect', '-d', type=str, default='./datasets/pre_detect/others')
 	parser.add_argument('--output', '-o', type=str, default='')
 	parser.add_argument('--size', '-s', type=int, default=128)
 	args = parser.parse_args()
