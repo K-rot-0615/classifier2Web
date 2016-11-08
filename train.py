@@ -26,16 +26,16 @@ def main():
     args = parser.parse_args()
 
     print('GPU: {}'.format(args.gpu))
-    #print('# unit: {}'.format(args.unit))
-    #print('# Minbatch-size: {}'.format(args.batchsize))
-    #print('# epoch: {}'.format(args.epoch))
-    #print('')
+    print('# Minbatch-size: {}'.format(args.batchsize))
+    print('# epoch: {}'.format(args.epoch))
+    print('')
 
     # prepare datasets
     data = []
-    data.append(np.asarray(['./datasets/ryota/', 0]))
-    data.append(np.asarray(['./datasets/sakamoto/', 1]))
-    data.append(np.asarray(['./datasets/masakatsu', 2]))
+    #data.append(np.asarray(['./datasets/ryota/', 0]))
+    #data.append(np.asarray(['./datasets/sakamoto/', 1]))
+    #data.append(np.asarray(['./datasets/masakatsu/', 2]))
+    data.append(np.asarray(['./datasets/ryota3/', 0]))
     train, test = labeling(data, args.channel)
 
     model = L.Classifier(Alex())
