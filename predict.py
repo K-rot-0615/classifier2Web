@@ -1,6 +1,6 @@
 import argparse
 from image import faceDetect
-from image import faceRead
+from image import dataRead
 from labeling import getPredictData
 from alexnet import Alex
 
@@ -19,7 +19,9 @@ def predict_image(model, data):
 
 def main():
     parser = argparse.ArgumentParser(description='face prediction')
-    parser.add_argument('--data', '-d', type=str, default='./datasets/test2/')
+    parser.add_argument('--testPath', '-t', type=str, default='./datasets/test/')
+    parser.add_argument('--detect', '-d', type=str, default='')
+    parser.add_argument('--output', '-o', type=str, default='')
     parser.add_argument('--size', '-s', type=int, default=128)
     parser.add_argument('--model', '-m', type=str, default='output2.model')
     parser.add_argument('--channel', '-c', type=int, default=3)
@@ -32,28 +34,34 @@ def main():
     model.to_cpu()
 
     #save file as predicted data
-    cap = cv2.VideoCapture(0)
-    while True:
-        ret,frame = cap.read()
+    #cap = cv2.VideoCapture(0)
+    #while True:
+        #ret,frame = cap.read()
         #cv2.imshow('predicted data', frame)
-        predicted_data = faceDetect(frame, 0, args.data, args.size)
+        #predicted_data = faceDetect(frame, 0, args.detect, args.output, args.size)
 
         # predict
-        images = faceRead(args.data)
+        #images = dataRead(args.testPath)
         #print images
-        for image in images:
+        #for image in images:
             #print image
-            test_data = getPredictData(image, args.channel)
-            result = predict_image(model, test_data)
-            print result
+            #test_data = getPredictData(image, args.channel)
+            #result = predict_image(model, test_data)
+            #print result
 
         # escape from the roop
-        k = cv2.waitKey(10)
-        if k == 27:
-            break
+        #k = cv2.waitKey(10)
+        #if k == 27:
+            #break
 
-    cap.release()
-    cv2.destroyAllWindows()
+    #cap.release()
+    #cv2.destroyAllWindows()
+
+    images = dataRead(args.testPath)
+    for image in images:
+        test_data = getPredictData(image, args.channel)
+        result = predict_image(model, test_data)
+        print result
 
 
 if __name__ == '__main__':
