@@ -1,5 +1,8 @@
 import argparse
+import serial
+import socket
 from image import faceDetect
+from image import faceDetect4Predict
 from image import dataRead
 from labeling import getPredictData
 from alexnet import Alex
@@ -17,7 +20,13 @@ def predict_image(model, data):
     return y.data[0]
 
 
-def main():
+def predict_result(image, channel, model):
+    data = getPredictData(image, channel)
+    result = predict_image(model, data)
+    return result
+
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='face prediction')
     parser.add_argument('--testPath', '-t', type=str, default='./datasets/test/')
     parser.add_argument('--detect', '-d', type=str, default='')
@@ -33,36 +42,33 @@ def main():
     chainer.serializers.load_npz(args.model, model)
     model.to_cpu()
 
-    #save file as predicted data
-    #cap = cv2.VideoCapture(0)
-    #while True:
-        #ret,frame = cap.read()
-        #cv2.imshow('predicted data', frame)
-        #predicted_data = faceDetect(frame, 0, args.detect, args.output, args.size)
+    # save file as predicted data
+    cap = cv2.VideoCapture(0)
+    while True:
+        ret,frame = cap.read()
+        cv2.imshow('predicted data', frame)
+        predicted_data = faceDetect4Predict(frame, 0, args.detect, args.output, args.size)
 
         # predict
-        #images = dataRead(args.testPath)
+        images = dataRead(args.output)
         #print images
-        #for image in images:
+        for image in images:
             #print image
-            #test_data = getPredictData(image, args.channel)
-            #result = predict_image(model, test_data)
-            #print result
+            test_data = getPredictData(image, args.channel)
+            result = predict_image(model, test_data)
+            print max(result)
 
         # escape from the roop
-        #k = cv2.waitKey(10)
-        #if k == 27:
-            #break
+        k = cv2.waitKey(10)
+        if k == 27:
+            break
 
-    #cap.release()
-    #cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
 
-    images = dataRead(args.testPath)
-    for image in images:
-        test_data = getPredictData(image, args.channel)
-        result = predict_image(model, test_data)
-        print result
-
-
-if __name__ == '__main__':
-    main()
+    # non-realtime predict
+    #images = dataRead(args.testPath)
+    #for image in images:
+        #test_data = getPredictData(image, args.channel)
+        #result = predict_image(model, test_data)
+        #print result
