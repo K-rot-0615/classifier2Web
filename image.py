@@ -19,7 +19,7 @@ height = []
 
 def dataRead(path):
 	data = []
-	imgList = glob.glob(path + '*.png')
+	imgList = glob.glob(path + '*')
 	for imgName in imgList:
 		data.append(imgName)
 	return data
@@ -122,17 +122,35 @@ def faceDetect4Predict(frame, cameraNum, pre_detectPath, savePath, resize):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='face detect')
-	parser.add_argument('--detect', '-d', type=str, default='./datasets/pre_detect/others')
+	parser.add_argument('--detect', '-d', type=str, default='')
 	parser.add_argument('--output', '-o', type=str, default='')
 	parser.add_argument('--size', '-s', type=int, default=128)
 	args = parser.parse_args()
 
+	# gather data for making model
+	'''
 	cap = cv2.VideoCapture(0)
 	while True:
 		ret, frame = cap.read()
 		cv2.imshow('camera capture', frame)
-		th0 = faceDetect(frame, cameraNum[0], args.detect, args.output, args.size)
+		pre_predictData = faceDetect(frame, cameraNum[0], args.detect, args.output, args.size)
 
+		k = cv2.waitKey(10)
+		if k == 27:
+			break
+
+	cap.release()
+	cv2.destroyAllWindows()
+	'''
+
+	# gather data for predict
+	cap = cv2.VideoCapture(0)
+	while True:
+		ret, frame = cap.read()
+		cv2.imshow('predicted data', frame)
+		predictedData = faceDetect4Predict(frame, 0, args.detect, args.output, args.size)
+
+		# escape from the roop
 		k = cv2.waitKey(10)
 		if k == 27:
 			break
