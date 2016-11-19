@@ -41,11 +41,16 @@ void loop(){
   //Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
   Udp.read(incomingPacket, 255);
 
+<<<<<<< HEAD
   Serial.println(incomingPacket);
+=======
+  //Serial.println(incomingPacket);
+>>>>>>> origin/master
 
   if(strcmp(incomingPacket, low) == 0){
      //digitalWrite(4, LOW);
      Serial.println("LOW!!!!!!!");
+<<<<<<< HEAD
   }
   
   if(strcmp(incomingPacket, high) == 0){
@@ -57,6 +62,14 @@ void loop(){
     Serial.printf("nanimonaiyo!");
   }
   */
+=======
+  }
+  
+  if(strcmp(incomingPacket, high) == 0){
+     //digitalWrite(4, HIGH);
+     Serial.println("HIGH!!!!!!");
+  }
+>>>>>>> origin/master
 
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
   Udp.write(replyPacket);
