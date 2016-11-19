@@ -42,7 +42,7 @@ def labeling(data, channel):
         for n in testData:
             path = n[0]
             label = n[1]
-            imgList = glob.glob(path + '*.png')
+            imgList = glob.glob(path + '*')
             for imgName in imgList:
                 img = Image.open(imgName)
                 r,g,b = img.split()
@@ -52,7 +52,6 @@ def labeling(data, channel):
 
                 imgData = np.asarray([imgData_R,imgData_G,imgData_B])
                 lblData = label
-                dimension = len(imgData)
 
                 imageData.append(imgData)
                 labelData.append(np.int32(lblData))
@@ -78,14 +77,18 @@ def getPredictData(image, channel):
         imgData_B = np.asarray(np.float32(b)/255.0)
         imgData = np.asarray([[[imgData_R, imgData_G, imgData_B]]])
 
-        #print (imgData)
         return imgData
 
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--channel', '-c', type=int, default=3)
+    args = parser.parse_args()
+
     data = []
     data.append(np.asarray(['./datasets/ryota/', 0]))
     data.append(np.asarray(['./datasets/masakatsu/', 1]))
     data.append(np.asarray(['./datasets/sakamoto/', 2]))
-    train, test = labeling(data)
-    print (len(test))
-    print (test[10])
+    train, test = labeling(data, args.channel)
+    #print len(train)
+    #print test[10]
