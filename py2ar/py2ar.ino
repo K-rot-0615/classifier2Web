@@ -1,19 +1,20 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUDP.h>
 
-const char* ssid = "hogehoge";
-const char* password = "hogehoge";
+const char* ssid = "koblab-1";
+const char* password = "koblabfms1116";
 
 WiFiUDP Udp;
 unsigned int localUdpPort = 8888;
 char incomingPacket[255];
+char* low = "LOOW";
+char* high = "HIGH";
 char replyPacket[] = "Hi there! Got the message : -)";
 
 
 void setup(){
 
-  pinMode(16, OUTPUT);
-  digitalWrite(16, LOW);
+  pinMode(4, OUTPUT);
 
   Serial.begin(115200);
   Serial.println();
@@ -37,17 +38,26 @@ void setup(){
 void loop(){
  int packetSize = Udp.parsePacket();
  if(packetSize){
-  Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
-  int len = Udp.read(incomingPacket, 255);
-  if(len > 0){
-    incomingPacket[len] = 0;
-  }
-  Serial.printf("UDP packet contents: %s\n", incomingPacket);
+  //Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
+  Udp.read(incomingPacket, 255);
 
-  if(replyPacket != ""){
-    digitalWrite(16, HIGH);
-    analogWrite(9, 255);
+  Serial.println(incomingPacket);
+
+  if(strcmp(incomingPacket, low) == 0){
+     //digitalWrite(4, LOW);
+     Serial.println("LOW!!!!!!!");
   }
+  
+  if(strcmp(incomingPacket, high) == 0){
+     //digitalWrite(4, HIGH);
+     Serial.println("HIGH!!!!!!");
+  }
+  /*
+  else{
+    Serial.printf("nanimonaiyo!");
+  }
+  */
+
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
   Udp.write(replyPacket);
   Udp.endPacket();
